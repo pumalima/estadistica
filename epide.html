@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro Diario Epidemiológico - EDAS / IRAS / FEBRILES</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+    body {
+        font-family: "Segoe UI", sans-serif;
+        background-color: #e9f8f9;
+        margin: 20px;
+        color: #333;
+    }
+    h2 {
+        text-align: center;
+        background-color: #a0e3f0;
+        padding: 12px;
+        border-radius: 12px;
+        font-size: 24px;
+        box-shadow: 0 0 8px #ccc;
+    }
+    h3 {
+        background-color: #c1eff7;
+        padding: 6px;
+        border-radius: 8px;
+        text-align: center;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        text-align: center;
+        font-size: 14px;
+    }
+    th, td {
+        border: 1px solid #999;
+        padding: 6px;
+    }
+    th {
+        background-color: #b2ebf2;
+    }
+    tr:nth-child(even) {
+        background-color: #f2f9f9;
+    }
+    .formulario {
+        background: #fff;
+        padding: 12px;
+        border-radius: 12px;
+        box-shadow: 0 0 6px #aaa;
+        margin-bottom: 10px;
+    }
+    .formulario input, select {
+        padding: 6px;
+        margin: 4px;
+        border-radius: 6px;
+        border: 1px solid #aaa;
+        width: 130px;
+    }
+    .formulario button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    .formulario button:hover {
+        background-color: #0056b3;
+    }
+    .descargar {
+        margin: 10px 0;
+        text-align: right;
+    }
+    .descargar button {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .descargar button:hover {
+        background-color: #1e7e34;
+    }
+    .accion-btn {
+        background-color: #ffc107;
+        color: black;
+        border: none;
+        padding: 5px 8px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .accion-btn:hover {
+        background-color: #e0a800;
+    }
+    .eliminar-btn {
+        background-color: #dc3545;
+        color: white;
+        margin-left: 5px;
+    }
+    .eliminar-btn:hover {
+        background-color: #b02a37;
+    }
+</style>
+</head>
+<body>
+
+<h2>📋 REGISTRO DIARIO EPIDEMIOLÓGICO</h2>
+
+<div class="formulario">
+    <h3>Agregar nuevo registro</h3>
+    <label>Tipo:</label>
+    <select id="tipo">
+        <option value="EDAS">💧 EDAS</option>
+        <option value="IRAS">🌬️ IRAS</option>
+        <option value="FEBRILES">🌡️ FEBRILES</option>
+    </select>
+    <label>Semana:</label><input type="number" id="semana" placeholder="Ej. 27">
+    <label>Fecha:</label><input type="date" id="fecha">
+    <label>Personal:</label><input type="text" id="personal" placeholder="Nombre">
+    <br>
+    <label>&lt;1 año:</label><input type="number" id="m1" min="0">
+    <label>1-4 años:</label><input type="number" id="m4" min="0">
+    <label>5-9 años:</label><input type="number" id="m9" min="0">
+    <label>10-19:</label><input type="number" id="m19" min="0">
+    <label>20-59:</label><input type="number" id="m59" min="0">
+    <label>&gt;60:</label><input type="number" id="m60" min="0">
+    <button onclick="agregarRegistro()">➕ Agregar</button>
+</div>
+
+<div class="descargar">
+    <button onclick="descargarTodo()">💾 Descargar TODO</button>
+</div>
+
+<div id="contenedor-tablas"></div>
+
+<script>
+let registros = JSON.parse(localStorage.getItem("registrosEpiMulti") || "[]");
+const tipos = ["EDAS", "IRAS", "FEBRILES"];
+
+mostrarTablas();
+
+function agregarRegistro() {
+    const tipo = document.getElementById('tipo').value;
+    const semana = document.getElementById('semana').value;
+    const fecha = document.getElementById('fecha').value;
+    const personal = document.getElementById('personal').value;
+    const m1 = parseInt(document.getElementById('m1').value || 0);
+    const m4 = parseInt(document.getElementById('m4').value || 0);
+    const m9 = parseInt(document.getElementById('m9').value || 0);
+    const m19 = parseInt(document.getElementById('m19').value || 0);
+    const m59 = parseInt(document.getElementById('m59').value || 0);
+    const m60 = parseInt(document.getElementById('m60').value || 0);
+    const total = m1 + m4 + m9 + m19 + m59 + m60;
+
+    if (!semana || !fecha || !personal) {
+        alert("Por favor complete Semana, Fecha y Personal");
+        return;
+    }
+
+    registros.push({ tipo, semana, fecha, personal, m1, m4, m9, m19, m59, m60, total });
+    localStorage.setItem("registrosEpiMulti", JSON.stringify(registros));
+
+    mostrarTablas();
+    limpiarFormulario();
+}
+
+function mostrarTablas() {
+    const contenedor = document.getElementById("contenedor-tablas");
+    contenedor.innerHTML = "";
+
+    tipos.forEach(tipo => {
+        const tablaHTML = `
+            <h3>${tipo === "EDAS" ? "💧" : tipo === "IRAS" ? "🌬️" : "🌡️"} ${tipo}</h3>
+            <div class="descargar"><button onclick="descargarExcel('${tipo}')">💾 Descargar ${tipo}</button></div>
+            <table id="tabla${tipo}">
+                <thead>
+                    <tr>
+                        <th>Semana</th><th>Fecha</th><th>Personal</th>
+                        <th><1 año</th><th>1-4 años</th><th>5-9 años</th>
+                        <th>10-19 años</th><th>20-59 años</th><th>>60 años</th><th>Total</th><th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        `;
+        contenedor.innerHTML += tablaHTML;
+
+        const cuerpo = document.querySelector(`#tabla${tipo} tbody`);
+        registros.filter(r => r.tipo === tipo).forEach((r, i) => {
+            const fila = cuerpo.insertRow();
+            fila.insertCell(0).innerText = r.semana;
+            fila.insertCell(1).innerText = r.fecha;
+            fila.insertCell(2).innerText = r.personal;
+            fila.insertCell(3).innerText = r.m1;
+            fila.insertCell(4).innerText = r.m4;
+            fila.insertCell(5).innerText = r.m9;
+            fila.insertCell(6).innerText = r.m19;
+            fila.insertCell(7).innerText = r.m59;
+            fila.insertCell(8).innerText = r.m60;
+            fila.insertCell(9).innerText = r.total;
+            const acciones = fila.insertCell(10);
+            acciones.innerHTML = `
+                <button class="accion-btn" onclick="editarRegistro(${i})">✏️ Editar</button>
+                <button class="accion-btn eliminar-btn" onclick="eliminarRegistro(${i})">🗑️</button>
+            `;
+        });
+    });
+}
+
+function limpiarFormulario() {
+    document.querySelectorAll('.formulario input').forEach(i => i.value = "");
+}
+
+function editarRegistro(i) {
+    const r = registros[i];
+    document.getElementById('tipo').value = r.tipo;
+    document.getElementById('semana').value = r.semana;
+    document.getElementById('fecha').value = r.fecha;
+    document.getElementById('personal').value = r.personal;
+    document.getElementById('m1').value = r.m1;
+    document.getElementById('m4').value = r.m4;
+    document.getElementById('m9').value = r.m9;
+    document.getElementById('m19').value = r.m19;
+    document.getElementById('m59').value = r.m59;
+    document.getElementById('m60').value = r.m60;
+    eliminarRegistro(i);
+}
+
+function eliminarRegistro(i) {
+    registros.splice(i, 1);
+    localStorage.setItem("registrosEpiMulti", JSON.stringify(registros));
+    mostrarTablas();
+}
+
+// ✅ Descarga solo de un tipo correctamente con columnas bien formateadas
+function descargarExcel(tipo) {
+    const datos = registros.filter(r => r.tipo === tipo);
+    if (datos.length === 0) return alert("No hay datos para " + tipo);
+
+    const cabecera = [
+        "Semana", "Fecha", "Personal",
+        "<1 año", "1-4 años", "5-9 años", "10-19 años",
+        "20-59 años", ">60 años", "Total"
+    ];
+
+    const filas = datos.map(r => [
+        r.semana, r.fecha, r.personal,
+        r.m1, r.m4, r.m9, r.m19, r.m59, r.m60, r.total
+    ]);
+
+    const ws = XLSX.utils.aoa_to_sheet([cabecera, ...filas]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, tipo);
+
+    const fechaActual = new Date().toISOString().split("T")[0];
+    XLSX.writeFile(wb, `Reporte_${tipo}_${fechaActual}.xlsx`);
+}
+
+// ✅ Descarga de todo junto en un solo archivo
+function descargarTodo() {
+    const wb = XLSX.utils.book_new();
+    tipos.forEach(tipo => {
+        const datos = registros.filter(r => r.tipo === tipo);
+        if (datos.length === 0) return;
+
+        const cabecera = [
+            "Semana", "Fecha", "Personal",
+            "<1 año", "1-4 años", "5-9 años", "10-19 años",
+            "20-59 años", ">60 años", "Total"
+        ];
+
+        const filas = datos.map(r => [
+            r.semana, r.fecha, r.personal,
+            r.m1, r.m4, r.m9, r.m19, r.m59, r.m60, r.total
+        ]);
+
+        const ws = XLSX.utils.aoa_to_sheet([cabecera, ...filas]);
+        XLSX.utils.book_append_sheet(wb, ws, tipo);
+    });
+
+    const fechaActual = new Date().toISOString().split("T")[0];
+    XLSX.writeFile(wb, `Reporte_Completo_${fechaActual}.xlsx`);
+}
+</script>
+</body>
+</html>
