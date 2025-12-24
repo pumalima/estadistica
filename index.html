@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estadística - P.S. Collanac</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+
+    /* Encabezado */
+    header {
+      background: linear-gradient(90deg, #a3d8f4, #b5ead7);
+      color: #000;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    header img { height: 60px; }
+
+    .titulo {
+      flex: 1;
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+
+    nav {
+      display: flex;
+      gap: 10px;
+    }
+
+    nav button {
+      background-color: #ffd6a5;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    nav button:hover { background-color: #ffc6ff; }
+
+    /* Fondo principal */
+    .fondo {
+      width: 100%;
+      height: 400px;
+      background-image: url("img/PS.png");
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    /* Carrusel */
+    .carrusel {
+      position: relative;
+      width: 80%;
+      max-width: 900px;
+      margin: 30px auto;
+      overflow: hidden;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .carrusel h2 {
+      text-align: center;
+      background-color: #caffbf;
+      padding: 10px;
+      margin: 0;
+      font-size: 1.3rem;
+      color: #000;
+    }
+
+    .imagenes {
+      display: flex;
+      transition: transform 0.6s ease-in-out;
+    }
+
+    .imagenes img {
+      width: 100%;
+      height: 350px;
+      object-fit: cover;
+    }
+
+    .flecha {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(255,255,255,0.7);
+      border: none;
+      font-size: 2rem;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 50%;
+      user-select: none;
+    }
+
+    .flecha:hover { background-color: rgba(255,255,255,0.9); }
+    .izquierda { left: 10px; }
+    .derecha { right: 10px; }
+
+    /* Secciones */
+    .secciones {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+      padding: 40px;
+      background-color: #fefae0;
+    }
+
+    .seccion {
+      background-color: #e9ffea;
+      border-radius: 15px;
+      text-align: center;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .seccion:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+    }
+
+    .seccion img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .seccion h3 {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      color: #222;
+    }
+
+    .seccion button {
+      background-color: #ffd6a5;
+      border: none;
+      padding: 10px 20px;
+      margin-top: 5px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .seccion button:hover { background-color: #ffb5a7; }
+
+    footer {
+      background-color: #a0c4ff;
+      color: #000;
+      text-align: center;
+      padding: 10px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="img/logo.jpg" alt="Logo del Puesto de Salud">
+    <div class="titulo">ESTADÍSTICA - P.S. COLLANAC</div>
+    <nav>
+      <button onclick="location.href='paginaluis.html'">Inicio</button>
+      <button onclick="location.href='https://pumalima.github.io/REPORTE-EPIDEMIOLOGICO/'">Epidemiología</button>
+    </nav>
+  </header>
+
+  <div class="fondo">
+    PUESTO DE SALUD COLLANAC
+  </div>
+
+  <div class="carrusel">
+    <h2>Avance de Vacunas Priorizadas</h2>
+    <div class="imagenes" id="imagenes">
+      <img src="img/1.png" alt="Vacuna 1">
+      <img src="img/2.png" alt="Vacuna 2">
+      <img src="img/3.png" alt="Vacuna 3">
+      <img src="img/4.png" alt="Vacuna 4">
+    </div>
+    <button class="flecha izquierda" onclick="mover(-1)">&#10094;</button>
+    <button class="flecha derecha" onclick="mover(1)">&#10095;</button>
+  </div>
+
+  <section class="secciones">
+    <div class="seccion">
+      <img src="img/anemia.jpg" alt="anemia">
+      <h3>ANEMIA</h3>
+      <button onclick="window.open('https://docs.google.com/spreadsheets/d/1hzNrSBbhW_oImaGX_OYobPr3bwDMU72a/edit?usp=sharing&ouid=118325648446038137906&rtpof=true&sd=true')">Ingresar</button>
+    </div>
+
+    <div class="seccion">
+      <img src="img/cred.jpg" alt="suplementacion">
+      <h3>SUPLEMENTACION Y VISITAS COLLANAC</h3>
+      <button onclick="window.open('https://docs.google.com/spreadsheets/d/18z61Ljs_qJO2cv2OqSuVnjGInuyUAC_w9ULgnltlrks/edit?usp=sharing')">Ingresar</button>
+    </div>
+
+    <div class="seccion">
+      <img src="img/suplementacion.jpg" alt="asitencia">
+      <h3>Niños con citas programadas  MENOR  1AÑO</h3>
+      <button onclick="window.open('https://docs.google.com/spreadsheets/d/1mB0RNNGOBUDP7YwqBnCaLzjYFAm3QmaG/edit?usp=sharing&ouid=118325648446038137906&rtpof=true&sd=true')">Ingresar</button>
+    </div>
+
+    <div class="seccion">
+      <img src="img/rn.jpg" alt="control rn">
+      <h3>CONTROL  CRED RN</h3>
+      <button onclick="window.open('https://docs.google.com/spreadsheets/d/1fVmGaLduTjRjqYE7dWhdE421fqpKwESF/edit?usp=sharing&ouid=118325648446038137906&rtpof=true&sd=true')">Ingresar</button>
+    </div>
+  </section>
+
+  <footer>
+    © 2025 Puesto de Salud Collanac — Área de Estadística
+  </footer>
+
+  <script>
+    // Carrusel con flechas
+    let index = 0;
+    const imagenes = document.getElementById("imagenes");
+    const total = imagenes.children.length;
+
+    function mover(direccion) {
+      index += direccion;
+      if (index < 0) index = total - 1;
+      if (index >= total) index = 0;
+      imagenes.style.transform = `translateX(${-index * 100}%)`;
+    }
+  </script>
+
+</body>
+</html>
